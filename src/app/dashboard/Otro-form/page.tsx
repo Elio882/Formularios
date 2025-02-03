@@ -1,245 +1,242 @@
-"use client"
+"use client";
+import { useForm } from "react-hook-form";
+import { Box, Typography, Button, Grid } from "@mui/material";
+import SignatureCanvas from "react-signature-canvas";
+import { useRef } from "react";
+import { FormTextField } from "@/components/atoms/form-text-field/FormTextField";
+import { InspectionSection } from "@/components/organisms/inspection-section/InspectionSection";
+import type { FormData, SectionResults } from "../../../types/formTypes";
+const sections = [
 
-import type React from "react"
-import { useForm, Controller, type SubmitHandler } from "react-hook-form"
-import { TextField, Checkbox, FormControlLabel, Typography, Grid, Paper, Button, Box } from "@mui/material"
+  { 
+    title: "ARGOLLAS EN D O ANILLOS",
+    items: [
+      "Con deformaciones o desgaste excesivo ",
+      "Picaduras ",
+      "Corrosión de la argolla ",
+    ],
+  },
+  {
+    title: "CINTAS Y/O FLEJES",
+    items: [
+      "Desgaste excesivo o cortes",
+      "Deformación o abolladuras",
+      "Corrosión",
+    ],
+  },
+  {
+    title: "GANCHOS",
+    items: ["Deformación o abolladuras", "Grietas o fisuras", "Corrosión"],
+  },
+  {
+    title: "HEBILLAS",
+    items: ["Deformación o abolladuras", "Grietas o fisuras", "Corrosión"],
+  },
+  {
+    title: "COSTURAS",
+    items: ["Descosidos o roturas", "Desgaste excesivo"],
+  },
+  {
+    title: "CONECTORES",
+    items: [
+      "Daños en el aislante",
+      "Contactos flojos o dañados",
+      "Deformación o roturas",
+    ],
+  },
+];
 
-interface FormData {
-  area: string
-  numeroInspeccion: string
-  codigoConector: string
-  codigoArnes: string
-  fecha: string
-  observaciones: string
-  nombreTrabajador: string
-  nombreSupervisor: string
-  [key: string]: boolean | string // Para los checkboxes dinámicos
-}
 
-const page: React.FC = () => {
-  const { control, handleSubmit } = useForm<FormData>()
+export default function page() {
+  const defaultValues: FormData = {
+    superintendencia: "",
+    trabajador: "",
+    supervisor: "",
+    area: "",
+    num_inspeccion: "",
+    cod_conector: "",
+    cod_arnes: "",
+    fecha: "",
+    observaciones: "",
+    resultados: sections.reduce<{ [key: string]: SectionResults }>(
+      (acc, section) => {
+        acc[section.title] = section.items.reduce<SectionResults>(
+          (itemAcc, item) => {
+            itemAcc[item] = {
+              respuesta: "",
+              observacion: "",
+            };
+            return itemAcc;
+          },
+          {}
+        );
+        return acc;
+      },
+      {}
+    ),
+    firma: "",
+  };
+  const { handleSubmit, control } = useForm<FormData>({
+    defaultValues,
+    mode: "onChange",
+  });
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    console.log(data)
-    // Aquí puedes manejar el envío del formulario
-  }
+  const sigCanvasRef = useRef<SignatureCanvas | null>(null);
 
-  const renderCheckboxGroup = (title: string, items: string[]) => (
-    <Box mb={2}>
-      <Typography variant="subtitle1" gutterBottom>
-        {title}
-      </Typography>
-      {items.map((item, index) => (
-        <Controller
-          key={index}
-          name={`${title.replace(/\s+/g, "")}_${index}`}
-          control={control}
-          defaultValue={false}
-          render={({ field }) => (
-            <FormControlLabel control={<Checkbox {...field} checked={field.value as boolean} />} label={item} />
-          )}
-        />
-      ))}
-    </Box>
-  )
+  const onSubmit = (data: FormData) => {
+    if (sigCanvasRef.current) {
+      const signature = sigCanvasRef.current
+        .getTrimmedCanvas()
+        .toDataURL("image/png");
+      data.firma = signature;
+    }
+    console.log("Datos enviados:", data);
+  };
+
+  const clearSignature = () => {
+    sigCanvasRef.current?.clear();
+  };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, m: 2 }}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Typography variant="h4" gutterBottom>
-          Lista de Chequeo Arnés y Conectores
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          Sistema de Protección Personal Contra Caídas
-        </Typography>
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{ maxWidth: "100%", borderRadius: 2 }}
+    >
+      <Grid container spacing={2}>
+        {/* Header */}
+        <Grid item xs={12}>
+          <Typography variant="h4" align="center" sx={{ mt: 2, mb: 2 }}>
+            INSPECCIÓN DE ARNES DE SEGURIDAD
+          </Typography>
+        </Grid>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="area"
+        {/* Form fields */}
+        <Grid item xs={12} container spacing={2}>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField
+              name="superintendencia"
               control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField {...field} fullWidth label="ÁREA/SECCIÓN" variant="outlined" margin="normal" />
-              )}
+              label="SUPERINTENDENCIA:"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="numeroInspeccion"
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField
+              name="trabajador"
               control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField {...field} fullWidth label="Nº INSPECCIÓN" variant="outlined" margin="normal" />
-              )}
+              label="TRABAJADOR:"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="codigoConector"
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField
+              name="supervisor"
               control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField {...field} fullWidth label="COD. CONECTOR" variant="outlined" margin="normal" />
-              )}
+              label="SUPERVISOR:"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="codigoArnes"
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField name="area" control={control} label="AREA:" />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField
+              name="num_inspeccion"
               control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField {...field} fullWidth label="COD. ARNÉS" variant="outlined" margin="normal" />
-              )}
+              label="NÚMERO DE INSPECCIÓN:"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField
+              name="cod_conector"
+              control={control}
+              label="COD. CONECTOR:"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField
+              name="cod_arnes"
+              control={control}
+              label="COD. ARNES:"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormTextField
               name="fecha"
               control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="FECHA"
-                  variant="outlined"
-                  margin="normal"
-                  type="date"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              )}
+              label=""
+              type="date"
             />
           </Grid>
         </Grid>
 
-        {renderCheckboxGroup('1. ARGOLLAS EN "D" O ANILLOS', [
-          "Picaduras, grietas, trizaduras (que abarquen un 50% de una sección)",
-          "Corrosión de la argolla (Corrosión de toda la argolla)",
-          "Con deformaciones o desgaste excesivo (dobladura, etc.)",
-        ])}
-
-        {renderCheckboxGroup("2. PROTECTOR DE ESPALDA", [
-          "Cortes (que pasan todo el grosor de la pieza)",
-          "Deterioro por uso o calor (reseco)",
-        ])}
-
-        {renderCheckboxGroup("3. HEBILLAS", [
-          "Corrosión de las hebillas (corrosión de toda la hebilla)",
-          "Defecto de funcionamiento (no enganchan o se traban)",
-          "Picaduras, grietas, trizaduras, quemaduras. (que abarquen un 50% de una sección)",
-          "Desgaste excesivo o deformaciones (dobladuras, etc.)",
-        ])}
-
-        {renderCheckboxGroup("4. PASADORES", [
-          "Cortes (que pasan todo el grosor de la pieza)",
-          "Deterioro por uso o calor (reseco)",
-        ])}
-
-        {renderCheckboxGroup("5. TEJIDO TRENZADO (Correas de fibra sintética)", [
-          "Presenta partes deshilachadas",
-          "Tiene cortes",
-          "Tiene fibras rotas",
-          "Presenta rasgaduras",
-          "Presenta daños por radiación ultravioleta: decoloración y presencia de astillas en la superficie del tejido trenzado (desintegración polvorienta)",
-          "Presenta daños por calor o productos químicos: manchas marrones, zonas decoloradas, áreas quebradizas",
-        ])}
-
-        {renderCheckboxGroup("6. AGUJEROS (POR QUEMADURAS O CORTES)", [
-          'Agujeros mayores a 1/16" (1,59 mm) en correas de hombro, pierna o parte mas resistente del arnés',
-          "Presencia de más de un (1) agujero pasante en la correa",
-          'Agujeros mayores a 1/4" (6,35 mm) en correas de pecho o los protectores',
-        ])}
-
-        {renderCheckboxGroup("7. COSTURAS", [
-          "Pérdida de costura",
-          "Daño de costura por calor o fricción",
-          "Más de dos (2) hilos cortados o rotos en el mismo patrón",
-          "Cortes que llegaron a las costuras",
-        ])}
-
-        {renderCheckboxGroup("8. DAÑO POR CALOR", [
-          "Quemaduras en correas de hombro, pierna o parte resistente del arnés",
-          "Quemadura en el protector de espalda que pasen su grosor",
-          "Las costuras han sido afectadas por quemaduras (perdida de costura)",
-          'Quemadura cerca al anillo "D" dorsal',
-          'Agujeros, quemaduras o cortes cerca al anillo "D" dorsal (de cualquier tamaño)',
-          'Cortes mayores a 1/8" (3,18 mm) en cualquier parte del tejido trenzado',
-        ])}
-
-        {renderCheckboxGroup("9. GANCHOS DE SEGURIDAD, AJUSTADORES, GUARDACABOS, BARRA EXPANSORA", [
-          "Presentan daños (que afecten su cierre o funcionalidad)",
-          "Están rotos o rajados (cualquier daño)",
-          "Presentan deformación (que afecte su cierre o funcionalidad)",
-          "Presentan corrosión (Corrosión de toda la argolla)",
-          "Presentas bordes afilados (que puedan causar cortes al conector durante su uso)",
-          "Resortes con fallas (trabado)",
-        ])}
-
-        {renderCheckboxGroup("10. AMORTIGUADOR DE CAIDAS", [
-          "Desgaste del protector, deformación, quemaduras",
-          "Testigo activado",
-        ])}
-
-        <Controller
-          name="observaciones"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              fullWidth
-              label="Observaciones Complementarias"
-              variant="outlined"
-              margin="normal"
-              multiline
-              rows={4}
-            />
-          )}
-        />
-
-        <Grid container spacing={2} mt={2}>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="nombreTrabajador"
+        {/* Inspection sections */}
+        <Grid item xs={12}>
+          <Typography align="center" sx={{ textTransform: "uppercase" }}>
+            ARNES <br />
+            HERRAJES(Componentes palsticos y metalicos integrales del arnes)
+          </Typography>
+          {sections.map((section, index) => (
+            <InspectionSection
+              key={index}
+              title={section.title}
+              items={section.items}
               control={control}
-              defaultValue=""
-              render={({ field }) => <TextField {...field} fullWidth label="Nombre Trabajador" variant="outlined" />}
             />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="nombreSupervisor"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField {...field} fullWidth label="Nombre Supervisor" variant="outlined" />}
-            />
-          </Grid>
+          ))}
         </Grid>
 
-        <Box mt={3}>
-          <Typography variant="body1" gutterBottom>
-            QUE DEBE HACER SI MARCO ALGUNA CASILLA ROJA "NO LO USE"
-          </Typography>
-          <Typography variant="body2">
-            Si usted nota que el arnés, conector u otro de los dispositivos inspeccionados se encuentra EN MAL ESTADO O
-            DEFECTUOSO, estos deben ser removidos cuanto antes del lugar de trabajo y dados de baja cortándolos
-            (coordine con su Supervisor). "NO LO USE"
-          </Typography>
-        </Box>
+        {/* Observations */}
+        <Grid item xs={12}>
+          <FormTextField
+            name="observaciones"
+            control={control}
+            label="OBSERVACIONES:"
+            multiline
+            rows={4}
+          />
+        </Grid>
 
-        <Box mt={3}>
-          <Button type="submit" variant="contained" color="primary">
-            Guardar Inspección
+        {/* Signature */}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom>
+            Firma Digital
+          </Typography>
+          <Box
+            sx={{
+              border: "1px solid #ccc",
+              borderRadius: 2,
+              width: "100%",
+              height: 200,
+              mb: 2,
+            }}
+          >
+            <SignatureCanvas
+              ref={sigCanvasRef}
+              canvasProps={{
+                width: 760,
+                height: 200,
+                className: "sigCanvas",
+              }}
+            />
+          </Box>
+          <Button onClick={clearSignature} variant="outlined" color="secondary">
+            Limpiar Firma
           </Button>
-        </Box>
-      </form>
-    </Paper>
-  )
+        </Grid>
+
+        {/* Submit button */}
+        <Grid item xs={12}>
+          <Box display="flex" justifyContent="center">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2, width: "25%" }}
+            >
+              Enviar
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 }
-
-export default page
-

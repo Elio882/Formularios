@@ -304,6 +304,7 @@ export default function page() {
                           `resultados.${section.title}.${item}.respuesta` as const
                         }
                         control={control}
+                        
                         render={({ field }) => (
                           <RadioGroup {...field} row>
                             <FormControlLabel
