@@ -11,9 +11,9 @@ const sections = [
   { 
     title: "ARGOLLAS EN D O ANILLOS",
     items: [
-      "Con deformaciones o desgaste excesivo ",
-      "Picaduras ",
-      "Corrosión de la argolla ",
+      "Picaduras, grietas, trizaduras (que abarquen un 50% de una sección)",
+      "Corrosión de la argolla (Corrosión de toda la argolla) ",
+      "Con deformaciones o desgaste excesivo (dobladura, etc.) ",
     ],
   },
   {
