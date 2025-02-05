@@ -2,8 +2,9 @@ import type { Control } from "react-hook-form"
 import type { FormData } from "../../../../types/formTypes"
 
 export interface IProps {
-  item: string
-  sectionTitle: string
+  sectionIndex: number
+  itemIndex: number
+  title: string
   control: Control<FormData>
 }
 

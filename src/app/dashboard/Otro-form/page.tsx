@@ -1,101 +1,232 @@
 "use client";
-import { useForm } from "react-hook-form";
-import { Box, Typography, Button, Grid } from "@mui/material";
-import SignatureCanvas from "react-signature-canvas";
-import { useRef } from "react";
-import { FormTextField } from "@/components/atoms/form-text-field/FormTextField";
-import { InspectionSection } from "@/components/organisms/inspection-section/InspectionSection";
-import type { FormData, SectionResults } from "../../../types/formTypes";
-const sections = [
 
-  { 
-    title: "ARGOLLAS EN D O ANILLOS",
+import { useForm } from "react-hook-form";
+import { Box } from "@mui/material";
+import { InspectionForm } from "@/components/organisms/inspection-form/InspectionForm";
+import type { FormData, InspectionSection } from "../../../types/formTypes";
+import { inspeccionService } from "../../../services/inspeccionService";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+const sections: InspectionSection[] = [
+  {
+    id: "1",
+    category: "ARGOLLAS EN 'D' O ANILLOS",
     items: [
-      "Picaduras, grietas, trizaduras (que abarquen un 50% de una sección)",
-      "Corrosión de la argolla (Corrosión de toda la argolla) ",
-      "Con deformaciones o desgaste excesivo (dobladura, etc.) ",
+      {
+        id: "1.1",
+        description: "Con deformaciones o desgaste excesivo (dobladura, etc.)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "1.2",
+        description:
+          "Picaduras, grietas, trizaduras (que abarquen un 50% de una sección)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "1.3",
+        description: "Corrosión de la argolla (Corrosión de toda la argolla)",
+        response: null,
+        observation: "",
+      },
     ],
   },
   {
-    title: "CINTAS Y/O FLEJES",
+    id: "2",
+    category: "PROTECTOR DE ESPALDA",
     items: [
-      "Desgaste excesivo o cortes",
-      "Deformación o abolladuras",
-      "Corrosión",
+      {
+        id: "2.1",
+        description: "Cortes (que pasan todo el grosor de la pieza)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "2.2",
+        description: "Deterioro por uso o calor (reseco)",
+        response: null,
+        observation: "",
+      },
     ],
   },
   {
-    title: "GANCHOS",
-    items: ["Deformación o abolladuras", "Grietas o fisuras", "Corrosión"],
-  },
-  {
-    title: "HEBILLAS",
-    items: ["Deformación o abolladuras", "Grietas o fisuras", "Corrosión"],
-  },
-  {
-    title: "COSTURAS",
-    items: ["Descosidos o roturas", "Desgaste excesivo"],
-  },
-  {
-    title: "CONECTORES",
+    id: "3",
+    category: "HEBILLAS",
     items: [
-      "Daños en el aislante",
-      "Contactos flojos o dañados",
-      "Deformación o roturas",
+      {
+        id: "3.1",
+        description: "Desgaste excesivo o deformaciones (dobladuras, etc.)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "3.2",
+        description:
+          "Picaduras, grietas, trizaduras, quemaduras (que abarquen un 50% de una sección)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "3.3",
+        description: "Corrosión de las hebillas (Corrosión de toda la hebilla)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "3.4",
+        description: "Defecto de funcionamiento (no enganchan o se traban)",
+        response: null,
+        observation: "",
+      },
+    ],
+  },
+  {
+    id: "4",
+    category: "PASADORES",
+    items: [
+      {
+        id: "4.1",
+        description: "Cortes (que pasan todo el grosor de la pieza)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "4.2",
+        description: "Deterioro por uso o calor (reseco)",
+        response: null,
+        observation: "",
+      },
+    ],
+  },
+  {
+    id: "tejidoTrenzado1",
+    category: "TEJIDO TRENZADO (Correas de fibra sintética)",
+    items: [
+      {
+        id: "5.1",
+        description: "Presenta partes deshilachadas",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "5.2",
+        description: "Tiene cortes",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "5.3",
+        description: "Tiene fibras rotas",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "5.4",
+        description: "Presenta rasgaduras",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "5.5",
+        description:
+          "Presenta daños por calor o productos químicos: manchas marrones, zonas decoloradas, áreas quebradizas",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "5.6",
+        description:
+          "Presenta daños por radiación ultravioleta: decoloración y presencia de astillas en la superficie del tejido trenzado (desintegración polvorienta)",
+        response: null,
+        observation: "",
+      },
+    ],
+  },
+  {
+    id: "conector",
+    category: "GANCHOS DE SEGURIDAD, AJUSTADORES, GUARDACABOS, BARRA EXPANSORA",
+    items: [
+      {
+        id: "6.1",
+        description: "Presentan daños (que afecten su cierre o funcionalidad)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "6.2",
+        description: "Están rotos o rajados (cualquier daño)",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "6.3",
+        description:
+          "Presentan deformación (que afecte su cierre o funcionalidad)",
+        response: null,
+        observation: "",
+      },
+    ],
+  },
+  {
+    id: "amortiguadorDeCaidas",
+    category: "AMORTIGUADOR DE CAIDAS",
+    items: [
+      {
+        id: "7.1",
+        description: "Desgaste del protector, deformación, quemaduras",
+        response: null,
+        observation: "",
+      },
+      {
+        id: "7.2",
+        description: "Testigo activado",
+        response: null,
+        observation: "",
+      },
     ],
   },
 ];
 
-
-export default function page() {
+export default function InspeccionArnesPage() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const defaultValues: FormData = {
-    superintendencia: "",
-    trabajador: "",
-    supervisor: "",
-    area: "",
-    num_inspeccion: "",
-    cod_conector: "",
-    cod_arnes: "",
-    fecha: "",
-    observaciones: "",
-    resultados: sections.reduce<{ [key: string]: SectionResults }>(
-      (acc, section) => {
-        acc[section.title] = section.items.reduce<SectionResults>(
-          (itemAcc, item) => {
-            itemAcc[item] = {
-              respuesta: "",
-              observacion: "",
-            };
-            return itemAcc;
-          },
-          {}
-        );
-        return acc;
-      },
-      {}
-    ),
-    firma: "",
+    informacionGeneral: {
+      superintendencia: "",
+      trabajador: "",
+      supervisor: "",
+      area: "",
+      numInspeccion: "",
+      codConector: "",
+      codArnes: "",
+      fecha: new Date().toISOString().split("T")[0],
+    },
+    resultados: sections,
+    observacionesComplementarias: "",
+    firmaInspector: "",
+    firmaSupervisor: "",
   };
+
   const { handleSubmit, control } = useForm<FormData>({
     defaultValues,
     mode: "onChange",
   });
 
-  const sigCanvasRef = useRef<SignatureCanvas | null>(null);
-
-  const onSubmit = (data: FormData) => {
-    if (sigCanvasRef.current) {
-      const signature = sigCanvasRef.current
-        .getTrimmedCanvas()
-        .toDataURL("image/png");
-      data.firma = signature;
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsSubmitting(true)
+      await inspeccionService.crear(data)
+      router.push("/dashboard/Otro-form")
+      console.log("Datos enviados:", data)
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error)
+      // Aquí podrías mostrar un mensaje de error al usuario
+    } finally {
+      setIsSubmitting(false)
     }
-    console.log("Datos enviados:", data);
-  };
-
-  const clearSignature = () => {
-    sigCanvasRef.current?.clear();
-  };
+  }
 
   return (
     <Box
@@ -103,140 +234,11 @@ export default function page() {
       onSubmit={handleSubmit(onSubmit)}
       sx={{ maxWidth: "100%", borderRadius: 2 }}
     >
-      <Grid container spacing={2}>
-        {/* Header */}
-        <Grid item xs={12}>
-          <Typography variant="h4" align="center" sx={{ mt: 2, mb: 2 }}>
-            INSPECCIÓN DE ARNES DE SEGURIDAD
-          </Typography>
-        </Grid>
-
-        {/* Form fields */}
-        <Grid item xs={12} container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField
-              name="superintendencia"
-              control={control}
-              label="SUPERINTENDENCIA:"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField
-              name="trabajador"
-              control={control}
-              label="TRABAJADOR:"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField
-              name="supervisor"
-              control={control}
-              label="SUPERVISOR:"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField name="area" control={control} label="AREA:" />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField
-              name="num_inspeccion"
-              control={control}
-              label="NÚMERO DE INSPECCIÓN:"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField
-              name="cod_conector"
-              control={control}
-              label="COD. CONECTOR:"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField
-              name="cod_arnes"
-              control={control}
-              label="COD. ARNES:"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormTextField
-              name="fecha"
-              control={control}
-              label=""
-              type="date"
-            />
-          </Grid>
-        </Grid>
-
-        {/* Inspection sections */}
-        <Grid item xs={12}>
-          <Typography align="center" sx={{ textTransform: "uppercase" }}>
-            ARNES <br />
-            HERRAJES(Componentes palsticos y metalicos integrales del arnes)
-          </Typography>
-          {sections.map((section, index) => (
-            <InspectionSection
-              key={index}
-              title={section.title}
-              items={section.items}
-              control={control}
-            />
-          ))}
-        </Grid>
-
-        {/* Observations */}
-        <Grid item xs={12}>
-          <FormTextField
-            name="observaciones"
-            control={control}
-            label="OBSERVACIONES:"
-            multiline
-            rows={4}
-          />
-        </Grid>
-
-        {/* Signature */}
-        <Grid item xs={12}>
-          <Typography variant="h6" gutterBottom>
-            Firma Digital
-          </Typography>
-          <Box
-            sx={{
-              border: "1px solid #ccc",
-              borderRadius: 2,
-              width: "100%",
-              height: 200,
-              mb: 2,
-            }}
-          >
-            <SignatureCanvas
-              ref={sigCanvasRef}
-              canvasProps={{
-                width: 760,
-                height: 200,
-                className: "sigCanvas",
-              }}
-            />
-          </Box>
-          <Button onClick={clearSignature} variant="outlined" color="secondary">
-            Limpiar Firma
-          </Button>
-        </Grid>
-
-        {/* Submit button */}
-        <Grid item xs={12}>
-          <Box display="flex" justifyContent="center">
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{ mt: 2, width: "25%" }}
-            >
-              Enviar
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
+      <InspectionForm
+        control={control}
+        onSubmit={handleSubmit(onSubmit)}
+        sections={sections}
+      />
     </Box>
   );
 }

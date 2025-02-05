@@ -25,6 +25,30 @@ interface FormData {
   cod_arnes: string;
   fecha: string;
   observaciones: string;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   resultados: Record<string, string>;
   firma: string;
 }

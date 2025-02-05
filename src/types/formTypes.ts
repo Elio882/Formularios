@@ -1,29 +1,39 @@
-export type InspectionResult = {
-  respuesta: string;  // Ahora es un arreglo para permitir múltiples respuestas
-  observacion: string;
-};
+export type CheckboxOption = "si" | "no" | "na"
 
-export type SectionResults = {
-  [item: string]: InspectionResult;
-};
+export type InspectionItem = {
+  id: string
+  description: string
+  response: CheckboxOption | null
+  observation: string
+}
+
+export type InspectionSection = {
+  id: string
+  category: string
+  items: InspectionItem[]
+}
 
 export type FormData = {
-  superintendencia: string;
-  trabajador: string;
-  supervisor: string;
-  area: string;
-  num_inspeccion: string;
-  cod_conector: string;
-  cod_arnes: string;
-  fecha: string;
-  observaciones: string;
-  resultados: {
-    [sectionTitle: string]: SectionResults;
-  };
-  firma: string;
-};
+  informacionGeneral: {
+    superintendencia: string
+    trabajador: string
+    supervisor: string
+    area: string
+    numInspeccion: string
+    codConector: string
+    codArnes: string
+    fecha: string
+  }
+  resultados: InspectionSection[]
+  observacionesComplementarias: string
+  firmaInspector: string
+  firmaSupervisor: string
+}
 
 export type FormFieldName =
-  | keyof FormData
-  | `resultados.${string}.${string}.respuesta`
-  | `resultados.${string}.${string}.observacion`;
+  | `informacionGeneral.${keyof FormData["informacionGeneral"]}`
+  | `resultados.${number}.items.${number}.response`
+  | `resultados.${number}.items.${number}.observation`
+  | "observacionesComplementarias"
+  | "firmaInspector"
+  | "firmaSupervisor"
