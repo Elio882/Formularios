@@ -37,3 +37,4 @@ export type FormFieldName =
   | "observacionesComplementarias"
   | "firmaInspector"
   | "firmaSupervisor"
+

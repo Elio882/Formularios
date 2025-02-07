@@ -1,14 +1,7 @@
 import type React from "react";
 import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import { Icon } from "../atoms/Icon";
-
-interface NavigationItemProps {
-  title: string;
-  icon: string;
-  selected: boolean;
-  onClick: () => void;
-  children?: React.ReactNode;
-}
+import { Icon } from "../../atoms/Icon";
+import type { IProps } from "./types/IProps.ts";
 
 export function NavigationItem({
   title,
@@ -16,7 +9,7 @@ export function NavigationItem({
   selected,
   onClick,
   children,
-}: NavigationItemProps) {
+}: IProps) {
   return (
     <ListItemButton selected={selected} onClick={onClick}>
       <ListItemIcon>

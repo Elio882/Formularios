@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { RadioGroup, FormControlLabel, Radio } from "@mui/material";
-interface RespuestaRadioGroupProps {
-  name: string;
-}
+
 
 export default function BooleanRadioGroup() {
   const [seleccion, setSeleccion] = useState({

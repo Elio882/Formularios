@@ -1,18 +1,30 @@
-import { Grid, Typography, Button, Box } from "@mui/material"
-import { FormTextField } from "@/components/atoms/form-text-field/FormTextField"
-import { InspectionSection } from "@/components/organisms/inspection-section/InspectionSection"
-import SignatureCanvas from "react-signature-canvas"
-import { useRef } from "react"
-import type {IProps} from "./types/IProps"
+import { Grid, Typography, Button, Box } from "@mui/material";
+import { FormTextField } from "@/components/atoms/form-text-field/FormTextField";
+import { InspectionSection } from "@/components/organisms/inspection-section/InspectionSection";
+import SignatureCanvas from "react-signature-canvas";
+import { useRef } from "react";
+import type { IProps } from "./types/IProps";
 
+export const InspectionForm = ({ control, onSubmit, sections, setValue }: IProps) => {
+  const inspectorSigCanvasRef = useRef<SignatureCanvas | null>(null);
+  const supervisorSigCanvasRef = useRef<SignatureCanvas | null>(null);
 
+  const clearSignature = (ref: React.RefObject<SignatureCanvas | null>) => {
+    if (ref.current) {
+      ref.current.clear();
+    }
+  };
 
-export const InspectionForm = ({ control, onSubmit, sections }: IProps) => {
-  const sigCanvasRef = useRef<SignatureCanvas | null>(null)
+  const handleSubmit = () => {
+    if (inspectorSigCanvasRef.current && supervisorSigCanvasRef.current) {
+      const inspectorSignature = inspectorSigCanvasRef.current.getTrimmedCanvas().toDataURL("image/png");
+      const supervisorSignature = supervisorSigCanvasRef.current.getTrimmedCanvas().toDataURL("image/png");
 
-  const clearSignature = () => {
-    sigCanvasRef.current?.clear()
-  }
+      setValue("firmaInspector", inspectorSignature);
+      setValue("firmaSupervisor", supervisorSignature);
+    }
+    onSubmit();
+  };
 
   return (
     <Grid container spacing={2}>
@@ -80,7 +92,7 @@ export const InspectionForm = ({ control, onSubmit, sections }: IProps) => {
         </Typography>
         <Box sx={{ border: "1px solid #ccc", borderRadius: 2, width: "100%", height: 200, mb: 2 }}>
           <SignatureCanvas
-            ref={sigCanvasRef}
+            ref={inspectorSigCanvasRef}
             canvasProps={{
               width: 380,
               height: 200,
@@ -88,7 +100,7 @@ export const InspectionForm = ({ control, onSubmit, sections }: IProps) => {
             }}
           />
         </Box>
-        <Button onClick={clearSignature} variant="outlined" color="secondary">
+        <Button onClick={() => clearSignature(inspectorSigCanvasRef)} variant="outlined" color="secondary">
           Limpiar Firma
         </Button>
       </Grid>
@@ -99,6 +111,7 @@ export const InspectionForm = ({ control, onSubmit, sections }: IProps) => {
         </Typography>
         <Box sx={{ border: "1px solid #ccc", borderRadius: 2, width: "100%", height: 200, mb: 2 }}>
           <SignatureCanvas
+            ref={supervisorSigCanvasRef}
             canvasProps={{
               width: 380,
               height: 200,
@@ -106,16 +119,18 @@ export const InspectionForm = ({ control, onSubmit, sections }: IProps) => {
             }}
           />
         </Box>
+        <Button onClick={() => clearSignature(supervisorSigCanvasRef)} variant="outlined" color="secondary">
+          Limpiar Firma
+        </Button>
       </Grid>
 
       <Grid item xs={12}>
         <Box display="flex" justifyContent="center">
-          <Button onClick={onSubmit} variant="contained" color="primary" sx={{ mt: 2, width: "25%" }}>
+          <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ mt: 2, width: "25%" }}>
             Enviar
           </Button>
         </Box>
       </Grid>
     </Grid>
-  )
-}
-
+  );
+};

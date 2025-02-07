@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { List, Divider, ListSubheader, Collapse } from "@mui/material"
-import { NavigationItem } from "../molecules/NavigationItem"
+import { NavigationItem } from "../molecules/navigation-item/NavigationItem"
 import { usePathname, useRouter } from "next/navigation"
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 

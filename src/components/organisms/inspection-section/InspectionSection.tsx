@@ -2,21 +2,15 @@ import { Box, Typography } from "@mui/material";
 import type { Control } from "react-hook-form";
 import { InspectionItem } from "@/components/molecules/inspection-item/InspeccionItem";
 import type {
-  FormData,
-  InspectionSection as IInspectionSection,
-} from "../../../types/formTypes";
+  IProps
+} from "./types/IProps";
 
-interface InspectionSectionProps {
-  sectionIndex: number;
-  section: IInspectionSection;
-  control: Control<FormData>;
-}
 
 export const InspectionSection = ({
   sectionIndex,
   section,
   control,
-}: InspectionSectionProps) => (
+}: IProps) => (
   <Box sx={{ mt: 4, width: "100%" }}>
     <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
       {section.category}

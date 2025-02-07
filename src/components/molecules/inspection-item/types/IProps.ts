@@ -4,7 +4,7 @@ import type { FormData } from "../../../../types/formTypes"
 export interface IProps {
   sectionIndex: number
   itemIndex: number
-  title: string
+  description: string
   control: Control<FormData>
 }
 

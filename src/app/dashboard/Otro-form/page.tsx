@@ -209,35 +209,36 @@ export default function InspeccionArnesPage() {
     firmaSupervisor: "",
   };
 
-  const { handleSubmit, control } = useForm<FormData>({
+  const { handleSubmit, control, setValue } = useForm<FormData>({
     defaultValues,
     mode: "onChange",
   });
 
   const onSubmit = async (data: FormData) => {
     try {
-      setIsSubmitting(true)
-      await inspeccionService.crear(data)
-      router.push("/dashboard/Otro-form")
-      console.log("Datos enviados:", data)
+      setIsSubmitting(true);
+      if (!data.firmaInspector || !data.firmaSupervisor) {
+        alert("Por favor, complete ambas firmas antes de enviar el formulario");
+        return;
+      }
+      await inspeccionService.crear(data);
+      router.push("/dashboard/Otro-form");
+      console.log("Datos enviados:", data);
     } catch (error) {
-      console.error("Error al enviar el formulario:", error)
+      console.error("Error al enviar el formulario:", error);
       // Aquí podrías mostrar un mensaje de error al usuario
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      sx={{ maxWidth: "100%", borderRadius: 2 }}
-    >
+    <Box component="form" noValidate sx={{ maxWidth: "100%", borderRadius: 2 }}>
       <InspectionForm
         control={control}
         onSubmit={handleSubmit(onSubmit)}
         sections={sections}
+        setValue={setValue}
       />
     </Box>
   );
