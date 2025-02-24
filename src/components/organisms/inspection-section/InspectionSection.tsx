@@ -1,5 +1,4 @@
 import { Box, Typography } from "@mui/material";
-import type { Control } from "react-hook-form";
 import { InspectionItem } from "@/components/molecules/inspection-item/InspeccionItem";
 import type {
   IProps
@@ -7,6 +6,7 @@ import type {
 
 
 export const InspectionSection = ({
+  titleIndex,
   sectionIndex,
   section,
   control,
@@ -18,6 +18,7 @@ export const InspectionSection = ({
     {section.items.map((item, itemIndex) => (
       <InspectionItem
         key={item.id}
+        titleIndex={titleIndex}
         sectionIndex={sectionIndex}
         itemIndex={itemIndex}
         description={item.description}

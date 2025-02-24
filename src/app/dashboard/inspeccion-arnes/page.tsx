@@ -25,30 +25,6 @@ interface FormData {
   cod_arnes: string;
   fecha: string;
   observaciones: string;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
   resultados: Record<string, string>;
   firma: string;
 }
@@ -118,7 +94,7 @@ export default function page() {
         //flexGrow: "1 !important",
       }}
     >
-      <Grid container spacing={0} direction={"row"}>
+      <Grid container spacing={0} >
         <Grid container spacing={0} direction={"row"} sx={{ width: "100%" }}>
           <Grid
             size={{ xs: 2, sm: 3, md: 2 }}

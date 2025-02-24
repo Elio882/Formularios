@@ -7,6 +7,8 @@ import type { FormData, InspectionSection } from "../../../types/formTypes";
 import { inspeccionService } from "../../../services/inspeccionService";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {titles} from "../../../types/titles-data"
+
 const sections: InspectionSection[] = [
   {
     id: "1",
@@ -193,6 +195,8 @@ export default function InspeccionArnesPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const defaultValues: FormData = {
+    documentCode: "1.02.P06.F19",
+    revisionNumber: 4,
     informacionGeneral: {
       superintendencia: "",
       trabajador: "",
@@ -201,11 +205,15 @@ export default function InspeccionArnesPage() {
       numInspeccion: "",
       codConector: "",
       codArnes: "",
-      fecha: new Date().toISOString().split("T")[0],
+      fecha: new Date(),
     },
-    resultados: sections,
+    resultados: titles,
+    operativo: null,
     observacionesComplementarias: "",
+    reviewDate: new Date(),
+    inspectionConductedBy:"",
     firmaInspector: "",
+    inspectionApprovedBy:"",
     firmaSupervisor: "",
   };
 
@@ -237,7 +245,9 @@ export default function InspeccionArnesPage() {
       <InspectionForm
         control={control}
         onSubmit={handleSubmit(onSubmit)}
-        sections={sections}
+        titles={titles}
+        documentCode={defaultValues.documentCode}
+        revisionNumber={defaultValues.revisionNumber}
         setValue={setValue}
       />
     </Box>

@@ -5,19 +5,19 @@ import {
   FormControlLabel,
   RadioGroup,
 } from "@mui/material";
-import { type Control, Controller } from "react-hook-form";
+import {  Controller } from "react-hook-form";
 import { FormTextField } from "@/components/atoms/form-text-field/FormTextField";
-import type { FormData } from "../../../types/formTypes";
 import type { IProps } from "./types/IProps";
 
 
 export const InspectionItem = ({
+  titleIndex,
   sectionIndex,
   itemIndex,
   description,
   control,
 }: IProps) => {
-  const fieldName = `resultados.${sectionIndex}.items.${itemIndex}` as const;
+  const fieldName = `resultados.${titleIndex}.items.${sectionIndex}.items.${itemIndex}` as const
 
   return (
     <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>

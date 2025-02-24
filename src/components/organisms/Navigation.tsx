@@ -27,6 +27,12 @@ export const NAVIGATION = [
     icon: "description",
   },
   {
+    segment: "inspecciones",
+    title: "inspecciones",
+    icon: "description",
+  },
+  
+  {
     segment: "inspeccion-arnes",
     title: "Inspección de Arnés",
     icon: "description",

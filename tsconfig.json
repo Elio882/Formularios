@@ -19,6 +19,7 @@
         "name": "next"
       }
     ],
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "@/*": ["./src/*"]
     }

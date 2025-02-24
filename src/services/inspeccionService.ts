@@ -1,5 +1,6 @@
 import api from "../lib/axios";
 import type { FormData } from "../types/formTypes";
+import type { FormDataExport } from "../types/formTypes";
 
 export const inspeccionService = {
   async crear(data: FormData) {
@@ -7,25 +8,67 @@ export const inspeccionService = {
     return response.data;
   },
   async obtenerPorId(id: string): Promise<FormData> {
-    const response = await api.get<FormData>(`/inspecciones/${id}`)
+    const response = await api.get<FormData>(`/inspecciones/${id}`);
+    return response.data;
+  },
+
+  async obtenerTodas() {
+    const response = await api.get<FormDataExport[]>("/inspecciones")
     return response.data
+  },
+
+  async listar(page = 1, limit = 10) {
+    const response = await api.get(`/inspecciones?page=${page}&limit=${limit}`)
+    return response.data
+  },
+
+  async actualizar(id: string, data: FormData): Promise<FormDataExport> {
+    const response = await api.put<FormDataExport>(`/inspecciones/${id}`, data)
+    return response.data
+  },
+
+  async eliminar(id: string) {
+    await api.delete(`/inspecciones/${id}`)
   },
 
   async descargarPdf(id: string) {
     try {
       const response = await api.get(`/inspecciones/${id}/pdf`, {
         responseType: "blob",
+      });
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `inspeccion-${id}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al descargar el PDF:", error);
+      throw error;
+    }
+  },
+
+  async descargarExcel(id: string) {
+    try {
+      const response = await api.get(`/inspecciones/${id}/excel`, {
+        responseType: "blob",
       })
-      const blob = new Blob([response.data], { type: "application/pdf" })
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement("a")
       link.href = url
-      link.download = `inspeccion-${id}.pdf`
+      link.download = `inspeccion-${id}.xlsx`
       link.click()
       window.URL.revokeObjectURL(url)
     } catch (error) {
-      console.error("Error al descargar el PDF:", error)
+      console.error("Error al descargar el Excel:", error)
       throw error
     }
   },
+  
+
+  
 };

@@ -1,17 +1,38 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Button, Typography, Box, CircularProgress, Snackbar } from "@mui/material"
+import React, { useState, useEffect } from "react"
+import { Button, Typography, Box, CircularProgress, Snackbar, LinearProgress } from "@mui/material"
 import { inspeccionService } from "../services/inspeccionService"
 import type { FormData } from "../types/formTypes"
+import { InspeccionPdfContent } from "./InspeccionPdfContent"
+import { usePDF } from "react-to-pdf"
 
-const inspeccionId = "3863af65-966b-44e0-8335-3de74546df0f"
+interface InspeccionDetalleProps {
+  inspeccionId: string
+}
 
-export const InspeccionDetalle = () => {
+export const InspeccionDetalle: React.FC<InspeccionDetalleProps> = ({ inspeccionId }) => {
   const [inspeccion, setInspeccion] = useState<FormData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [downloadingPdf, setDownloadingPdf] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  
+  // Modificar la configuración de usePDF
+  const { toPDF, targetRef } = usePDF({
+    filename: `inspeccion-${inspeccionId}.pdf`,
+    method: 'save',
+    page: { 
+      format: 'a4',
+      orientation: 'portrait',
+      margin: 10 
+    },
+    canvas: {
+      // Aumentar la calidad del PDF
+      //scale: 2,
+      logging: true,
+      useCORS: true
+    }
+  })
 
   useEffect(() => {
     const fetchInspeccion = async () => {
@@ -27,18 +48,22 @@ export const InspeccionDetalle = () => {
     }
 
     fetchInspeccion()
-  }, [])
+  }, [inspeccionId])
 
-  const handleDescargarPdf = async () => {
-    setDownloadingPdf(true)
+  const handleGenerarPdf = async () => {
+    if (!inspeccion) return
+
+    setGeneratingPdf(true)
     setError(null)
     try {
-      await inspeccionService.descargarPdf(inspeccionId)
+      // Asegúrate de que el contenido esté renderizado antes de generar el PDF
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await toPDF()
     } catch (error) {
-      console.error("Error al descargar el PDF:", error)
-      setError("Hubo un problema al descargar el PDF. Por favor, intente nuevamente.")
+      console.error("Error al generar el PDF:", error)
+      setError("Hubo un problema al generar el PDF. Por favor, intente nuevamente.")
     } finally {
-      setDownloadingPdf(false)
+      setGeneratingPdf(false)
     }
   }
 
@@ -56,42 +81,36 @@ export const InspeccionDetalle = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Detalles de la Inspección
-      </Typography>
-      <Typography variant="h6">Información General</Typography>
-      <Box mb={2}>
-        {Object.entries(inspeccion.informacionGeneral).map(([key, value]) => (
-          <Typography key={key}>
-            {key}: {value}
-          </Typography>
-        ))}
+      {/* Contenido visible para el PDF */}
+      <Box ref={targetRef} sx={{ position: 'relative', width: '210mm', margin: '0 auto' }}>
+        <InspeccionPdfContent inspeccion={inspeccion} />
       </Box>
-      <Typography variant="h6">Resultados</Typography>
-      {inspeccion.resultados.map((seccion) => (
-        <Box key={seccion.id} mb={2}>
-          <Typography variant="subtitle1">{seccion.category}</Typography>
-          {seccion.items.map((item) => (
-            <Box key={item.id} ml={2}>
-              <Typography>{item.description}</Typography>
-              <Typography>Respuesta: {item.response || "No respondido"}</Typography>
-              {item.observation && <Typography>Observación: {item.observation}</Typography>}
-            </Box>
-          ))}
-        </Box>
-      ))}
-      <Typography variant="h6">Observaciones Complementarias</Typography>
-      <Typography>{inspeccion.observacionesComplementarias || "Sin observaciones"}</Typography>
+
+      {/* Botones y controles */}
       <Box mt={2}>
-        <Button onClick={handleDescargarPdf} variant="contained" color="primary" disabled={downloadingPdf}>
-          {downloadingPdf ? <CircularProgress size={24} /> : "Descargar PDF"}
+        <Button 
+          onClick={handleGenerarPdf} 
+          variant="contained" 
+          color="primary" 
+          disabled={generatingPdf}
+        >
+          {generatingPdf ? "Generando PDF..." : "Generar PDF"}
         </Button>
       </Box>
-      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError(null)} message={error} />
+
+      {generatingPdf && (
+        <Box mt={2}>
+          <Typography>Generando PDF, por favor espere...</Typography>
+          <LinearProgress />
+        </Box>
+      )}
+
+      <Snackbar 
+        open={!!error} 
+        autoHideDuration={6000} 
+        onClose={() => setError(null)} 
+        message={error} 
+      />
     </Box>
   )
 }
-
-
-
-

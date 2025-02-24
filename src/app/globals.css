@@ -40,3 +40,31 @@ a {
     color-scheme: dark;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #pdf-content,
+  #pdf-content * {
+    visibility: visible !important;
+  }
+  #pdf-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 215mm;
+    height: 279mm;
+  }
+}
+
+/* Estilos adicionales para el contenedor del PDF */
+.pdf-container {
+  background: white;
+  width: 215mm;
+  min-height: 279mm;
+  padding: 0mm 7.5mm 7.5mm 7.5mm;
+  margin: 0 auto; 
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
